@@ -1,0 +1,27 @@
+# Core numerical libraries
+numpy>=1.24
+
+# Embedding models
+sentence-transformers>=2.6.0
+torch>=2.1
+
+# Vector database
+faiss-cpu>=1.7.4
+
+# PDF ingestion
+pymupdf>=1.23
+
+# Experiment tracking (MLOps)
+mlflow>=2.11
+
+# Configuration handling
+pyyaml>=6.0
+
+# Progress bars
+tqdm>=4.66
+
+# CLI utilities
+argparse
+
+# Optional (useful for debugging / experimentation)
+pandas>=2.1
