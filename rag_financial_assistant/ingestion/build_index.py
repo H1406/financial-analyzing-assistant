@@ -30,7 +30,7 @@ def main():
 
         dim = embeddings.shape[1]
 
-        store = VectorStore(dim)
+        store = VectorStore.create(dim)
 
         store.add(embeddings, chunks)
 
