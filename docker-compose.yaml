@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build: ./rag_financial_assistant
+    ports:
+      - "8000:8000"
+    volumes:
+      - hf_cache:/root/.cache/huggingface
+    environment:
+      - HF_HOME=/root/.cache/huggingface
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  hf_cache:

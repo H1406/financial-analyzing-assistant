@@ -6,12 +6,12 @@ class LocalLLMGenerator:
     def __init__(self):
 
         model_name = "Qwen/Qwen2.5-0.5B-Instruct"
-
+        self.device = "cpu"
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            device_map="auto",
+            device_map= self.device,
             torch_dtype="auto"
         )
 
@@ -35,15 +35,3 @@ class LocalLLMGenerator:
         ]
 
         return self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
-# import ollama
-
-# class LocalLLMGenerator:
-
-#     def generate(self, prompt):
-
-#         response = ollama.chat(
-#             model="phi3",
-#             messages=[{"role": "user", "content": prompt}]
-#         )
-
-#         return response["message"]["content"]
