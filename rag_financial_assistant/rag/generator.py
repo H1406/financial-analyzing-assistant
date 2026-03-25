@@ -5,32 +5,36 @@ class LocalLLMGenerator:
 
     def __init__(self):
 
-        model_name = "microsoft/Phi-3-mini-4k-instruct"
+        model_name = "Qwen/Qwen2.5-0.5B-Instruct"
 
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
 
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name,
             device_map="auto",
-            torch_dtype=torch.bfloat16
-        )
-
-        gen_config = GenerationConfig(
-        max_new_tokens=200,
-        do_sample=False,
-        )
-
-        self.pipe = pipeline(
-            "text-generation",
-            model=self.model,
-            tokenizer=self.tokenizer,
-            generation_config=gen_config,
+            torch_dtype="auto"
         )
 
     def generate(self, prompt):
-        # no generation kwargs here
-        outputs = self.pipe(prompt)
-        return outputs[0]["generated_text"]
+        messages = [
+            {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ]
+        text = self.tokenizer.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
+        )
+        model_inputs = self.tokenizer([text], return_tensors="pt").to(self.model.device)
+        generated_ids = self.model.generate(
+            **model_inputs,
+            max_new_tokens=512
+        )
+        generated_ids = [
+            output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+        ]
+
+        return self.tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
 # import ollama
 
 # class LocalLLMGenerator:

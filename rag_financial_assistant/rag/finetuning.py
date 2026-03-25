@@ -25,7 +25,7 @@ def format_example(example):
 dataset = load_dataset("json", data_files="data/finetune_dataset.jsonl")
 dataset = dataset.map(format_example)
 
-model_name = "microsoft/Phi-3-mini-4k-instruct"
+model_name = "Qwen/Qwen2.5-0.5B-Instruct"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
@@ -46,7 +46,7 @@ model = get_peft_model(model, lora_config)
 model.print_trainable_parameters()
 
 training_args = TrainingArguments(
-    output_dir="./phi3-finance-lora",
+    output_dir="./qwen2.5-finance-lora",
     per_device_train_batch_size=1,
     gradient_accumulation_steps=4,
     learning_rate=2e-4,
@@ -63,5 +63,5 @@ trainer = SFTTrainer(
 trainer.train()
 
 model = model.merge_and_unload()
-model.save_pretrained("./phi3-finance")
-tokenizer.save_pretrained("./phi3-finance")
+model.save_pretrained("./qwen2.5-finance")
+tokenizer.save_pretrained("./qwen2.5-finance")
