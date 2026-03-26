@@ -17,7 +17,7 @@ class LocalLLMGenerator:
 
     def generate(self, prompt):
         messages = [
-            {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant."},
+            {"role": "system", "content": "You are Qwen, created by Alibaba Cloud. You are a helpful assistant in financial analysis."},
             {"role": "user", "content": prompt}
         ]
         text = self.tokenizer.apply_chat_template(
