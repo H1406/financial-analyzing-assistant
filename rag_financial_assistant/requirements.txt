@@ -25,3 +25,10 @@ argparse
 
 # Optional (useful for debugging / experimentation)
 pandas>=2.1
+
+# Fine-tuning
+transformers>=4.40
+peft>=0.10
+trl>=0.8
+accelerate>=0.29
+datasets>=2.19

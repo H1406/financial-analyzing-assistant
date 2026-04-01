@@ -1,8 +1,11 @@
+import json
+import os
+
+import yaml
+
 from retrieval.retriever import Retriever
 from rag.prompt_template import build_prompt
 from rag.generator import LocalLLMGenerator
-import yaml
-import json
 
 class RAGPipeline:
 
@@ -23,13 +26,14 @@ class RAGPipeline:
         answer = self.generator.generate(prompt)
 
         return answer, contexts
-    def save_training_example(query, contexts, answer):
-
+    @staticmethod
+    def save_training_example(query: str, contexts: list, answer: str, path: str = "data/finetune_dataset.jsonl") -> None:
+        """Append a QA pair to the fine-tuning dataset JSONL file."""
         example = {
             "query": query,
             "contexts": [c["text"] for c in contexts],
-            "answer": answer
+            "answer": answer,
         }
-
-        with open("data/finetune_dataset.jsonl", "a") as f:
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "a") as f:
             f.write(json.dumps(example) + "\n")
