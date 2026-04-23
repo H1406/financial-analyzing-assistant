@@ -3,9 +3,14 @@ chunk_size: 400
 chunk_overlap: 50
 top_k: 5
 
+retrieval:
+  vector_store_path: data/processed
+  top_k: 5
+  score_type: l2_distance
+
 finetuning:
   model_name: "Qwen/Qwen2.5-0.5B-Instruct"
-  dataset_path: "data/finetune_dataset.jsonl"
+  dataset_path: "data/fin_data/train.json"
   output_dir: "./qwen2.5-finance-lora"
   merged_output_dir: "./qwen2.5-finance"
   lora:

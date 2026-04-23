@@ -184,7 +184,7 @@ def run_finetuning(config_path: str = "config.yaml") -> str:
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         base_model = AutoModelForCausalLM.from_pretrained(
             model_name,
-            device_map="auto",
+            device_map="mps",
         )
 
         # --- 4. LoRA -------------------------------------------------------------
@@ -203,11 +203,12 @@ def run_finetuning(config_path: str = "config.yaml") -> str:
 
         # --- 5. Training arguments -----------------------------------------------
         train_cfg = ft_cfg["training"]
+        print(type(train_cfg["learning_rate"]), train_cfg["learning_rate"])
         training_args = TrainingArguments(
             output_dir=ft_cfg["output_dir"],
             per_device_train_batch_size=train_cfg["per_device_train_batch_size"],
             gradient_accumulation_steps=train_cfg["gradient_accumulation_steps"],
-            learning_rate=train_cfg["learning_rate"],
+            learning_rate=float(train_cfg["learning_rate"]),  # type: ignore train_cfg["learning_rate"],
             num_train_epochs=train_cfg["num_train_epochs"],
             logging_steps=train_cfg["logging_steps"],
             save_steps=train_cfg["save_steps"],

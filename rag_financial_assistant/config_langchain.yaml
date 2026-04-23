@@ -1,0 +1,62 @@
+# LangChain-backed RAG configuration.
+# Run from rag_financial_assistant/ and pass this file to LangChainRAGPipeline
+# if you want to compare settings independently from config.yaml.
+
+pipeline:
+  name: langchain_rag
+  framework: langchain
+
+embedding_model: all-MiniLM-L6-v2
+
+retrieval:
+  vector_store_path: data/processed
+  top_k: 5
+  score_type: l2_distance
+
+chunking:
+  chunk_size: 400
+  chunk_overlap: 50
+
+generation:
+  model_name: Qwen/Qwen2.5-0.5B-Instruct
+  device: auto
+  dtype: float32
+  max_new_tokens: 128
+  do_sample: false
+  temperature: null
+  top_p: null
+
+prompt:
+  system_message: "You are a helpful assistant in financial analysis."
+  fallback_answer: "The information is not available in the documents."
+
+langchain:
+  chain_type: lcel
+  document_variable_name: context
+  query_variable_name: query
+  return_sources: true
+
+finetuning:
+  model_name: Qwen/Qwen2.5-0.5B-Instruct
+  dataset_path: data/fin_data/train.json
+  output_dir: ./qwen2.5-finance-lora
+  merged_output_dir: ./qwen2.5-finance
+  lora:
+    r: 16
+    lora_alpha: 32
+    target_modules: ["q_proj", "k_proj", "v_proj", "o_proj"]
+    lora_dropout: 0.05
+    bias: none
+  training:
+    per_device_train_batch_size: 1
+    gradient_accumulation_steps: 4
+    learning_rate: 2e-4
+    num_train_epochs: 3
+    logging_steps: 10
+    save_steps: 100
+    warmup_ratio: 0.03
+    lr_scheduler_type: cosine
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  experiment_name: financial_langchain_rag

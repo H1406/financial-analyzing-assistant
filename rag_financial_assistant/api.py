@@ -109,13 +109,65 @@ def query():
     query_embedding = embedding_model.embed_query(user_query)
     contexts = store.search(query_embedding, top_k=5)
 
-    # Run RAG
-    rag = RAGPipeline()
-    answer, _ = rag.run(user_query)
+    pipeline = data.get("pipeline", "custom")
+
+    if pipeline == "langchain":
+        from rag.langchain_pipeline import LangChainRAGPipeline
+
+        rag = LangChainRAGPipeline(vector_store=store)
+        answer, contexts = rag.run(user_query)
+    elif pipeline == "custom":
+        rag = RAGPipeline()
+        answer, contexts = rag.run_with_contexts(user_query, contexts)
+    else:
+        return jsonify({"error": "pipeline must be 'custom' or 'langchain'"}), 400
 
     return jsonify({
         "answer": answer,
-        "sources": contexts
+        "sources": contexts,
+        "pipeline": pipeline
+    })
+
+
+@app.route("/query/compare", methods=["POST"])
+def query_compare():
+
+    data = request.get_json()
+
+    session_id = data.get("session_id")
+    user_query = data.get("query")
+
+    if session_id not in SESSION_STORE:
+        return jsonify({"error": "Invalid session"}), 400
+
+    store = SESSION_STORE[session_id]["vector_store"]
+
+    if store is None:
+        return jsonify({"error": "No documents uploaded"}), 400
+
+    query_embedding = embedding_model.embed_query(user_query)
+    custom_contexts = store.search(query_embedding, top_k=5)
+
+    custom_rag = RAGPipeline()
+    custom_answer, custom_contexts = custom_rag.run_with_contexts(user_query, custom_contexts)
+
+    from rag.langchain_pipeline import LangChainRAGPipeline
+
+    langchain_rag = LangChainRAGPipeline(
+        vector_store=store,
+        generator=custom_rag.generator,
+    )
+    langchain_answer, langchain_contexts = langchain_rag.run(user_query)
+
+    return jsonify({
+        "custom": {
+            "answer": custom_answer,
+            "sources": custom_contexts,
+        },
+        "langchain": {
+            "answer": langchain_answer,
+            "sources": langchain_contexts,
+        }
     })
 
 # HEALTH CHECK

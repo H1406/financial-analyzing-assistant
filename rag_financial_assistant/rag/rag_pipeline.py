@@ -21,6 +21,10 @@ class RAGPipeline:
 
         contexts = self.retriever.retrieve(query)
 
+        return self.run_with_contexts(query, contexts)
+
+    def run_with_contexts(self, query, contexts):
+
         prompt = build_prompt(query, contexts)
 
         answer = self.generator.generate(prompt)
