@@ -35,7 +35,7 @@ Answer:
 class LangChainRAGPipeline:
     """LangChain LCEL version of the existing custom RAG pipeline."""
 
-    def __init__(self, config_path="config.yaml", vector_store=None, generator=None):
+    def __init__(self, config_path="config_langchain.yaml", vector_store=None, generator=None):
         self.config = yaml.safe_load(open(config_path))
         self.vector_store = vector_store
         self.top_k = self.config.get("top_k", self.config.get("retrieval", {}).get("top_k", 5))

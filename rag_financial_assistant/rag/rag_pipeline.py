@@ -14,7 +14,6 @@ class RAGPipeline:
         config = yaml.safe_load(open("config.yaml"))
 
         self.retriever = Retriever(config)
-
         self.generator = LocalLLMGenerator()
 
     def run(self, query):

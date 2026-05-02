@@ -109,7 +109,7 @@ def query():
     query_embedding = embedding_model.embed_query(user_query)
     contexts = store.search(query_embedding, top_k=5)
 
-    pipeline = data.get("pipeline", "custom")
+    pipeline = data.get("pipeline", "langchain")
 
     if pipeline == "langchain":
         from rag.langchain_pipeline import LangChainRAGPipeline

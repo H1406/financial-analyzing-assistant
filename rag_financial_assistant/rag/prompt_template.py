@@ -17,9 +17,11 @@ Question:
 
 Instructions:
 - Answer based only on the provided context
-- If the answer cannot be found, say "The information is not available in the documents."
+
 
 Answer:
 """
 
     return prompt
+
+# - If the answer cannot be found, say "The information is not available in the documents."
