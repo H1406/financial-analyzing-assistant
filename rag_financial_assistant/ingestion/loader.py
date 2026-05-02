@@ -1,5 +1,6 @@
 import os
-import fitz
+
+from ingestion.pdf_extractor import extract_documents
 
 
 def load_documents(folder):
@@ -8,16 +9,12 @@ def load_documents(folder):
     for file in os.listdir(folder):
         path = os.path.join(folder, file)
 
-        if file.endswith(".pdf"):
-            doc = fitz.open(path)
+        if not os.path.isfile(path):
+            continue
 
-            for page_num, page in enumerate(doc):
-                text = page.get_text()
+        with open(path, "rb") as handle:
+            file_bytes = handle.read()
 
-                documents.append({
-                    "text": text,
-                    "source": file,
-                    "page": page_num
-                })
+        documents.extend(extract_documents(file_bytes, file))
 
     return documents

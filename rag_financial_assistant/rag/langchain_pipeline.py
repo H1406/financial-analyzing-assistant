@@ -38,7 +38,10 @@ class LangChainRAGPipeline:
     def __init__(self, config_path="config_langchain.yaml", vector_store=None, generator=None):
         self.config = yaml.safe_load(open(config_path))
         self.vector_store = vector_store
-        self.top_k = self.config.get("top_k", self.config.get("retrieval", {}).get("top_k", 5))
+        retrieval_config = self.config.get("retrieval", {})
+        self.top_k = self.config.get("top_k", retrieval_config.get("top_k", 5))
+        self.vector_weight = retrieval_config.get("vector_weight", 0.6)
+        self.bm25_weight = retrieval_config.get("bm25_weight", 0.4)
         self.generator = generator or LocalLLMGenerator()
 
         if self.vector_store is None:
@@ -74,7 +77,13 @@ class LangChainRAGPipeline:
             contexts = self.retriever.retrieve(query)
         else:
             query_embedding = self.embedding_model.embed_query(query)
-            contexts = self.vector_store.search(query_embedding, self.top_k)
+            contexts = self.vector_store.search(
+                query_embedding=query_embedding,
+                query_text=query,
+                top_k=self.top_k,
+                vector_weight=self.vector_weight,
+                bm25_weight=self.bm25_weight,
+            )
 
         mlflow.log_metric("langchain_latency_retrieval", time.time() - start)
         return [self._context_to_document(context) for context in contexts]

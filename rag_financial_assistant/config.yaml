@@ -6,7 +6,9 @@ top_k: 5
 retrieval:
   vector_store_path: data/processed
   top_k: 5
-  score_type: l2_distance
+  score_type: hybrid_rrf
+  vector_weight: 0.6
+  bm25_weight: 0.4
 
 finetuning:
   model_name: "Qwen/Qwen2.5-0.5B-Instruct"

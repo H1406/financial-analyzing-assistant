@@ -9,6 +9,7 @@ torch>=2.1
 faiss-cpu>=1.7.4
 
 # PDF ingestion
+pypdf>=5.0
 pymupdf>=1.23
 
 # Experiment tracking (MLOps)

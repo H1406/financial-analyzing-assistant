@@ -5,8 +5,8 @@ from flask_cors import CORS
 
 # Your existing imports
 from rag.rag_pipeline import RAGPipeline
-from ingestion.loader import load_documents
 from ingestion.chunking import chunk_documents
+from ingestion.pdf_extractor import extract_documents
 from retrieval.embedding_model import EmbeddingModel
 from retrieval.vector_store import VectorStore
 
@@ -58,14 +58,8 @@ def upload():
     if not file:
         return jsonify({"error": "No file uploaded"}), 400
 
-    # Read file
-    text = file.read().decode("utf-8", errors="ignore")
-
-    documents = [{
-        "text": text,
-        "source": file.filename,
-        "page": 0
-    }]
+    file_bytes = file.read()
+    documents = extract_documents(file_bytes, file.filename)
 
     # Chunk
     chunks = chunk_documents(documents, 400, 50)
@@ -107,7 +101,7 @@ def query():
 
     # Retrieve
     query_embedding = embedding_model.embed_query(user_query)
-    contexts = store.search(query_embedding, top_k=5)
+    contexts = store.search(query_embedding=query_embedding, query_text=user_query, top_k=5)
 
     pipeline = data.get("pipeline", "langchain")
 
@@ -146,7 +140,7 @@ def query_compare():
         return jsonify({"error": "No documents uploaded"}), 400
 
     query_embedding = embedding_model.embed_query(user_query)
-    custom_contexts = store.search(query_embedding, top_k=5)
+    custom_contexts = store.search(query_embedding=query_embedding, query_text=user_query, top_k=5)
 
     custom_rag = RAGPipeline()
     custom_answer, custom_contexts = custom_rag.run_with_contexts(user_query, custom_contexts)
